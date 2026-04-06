@@ -3,7 +3,7 @@ from tkinter import messagebox
 import random
 import serial
 
-BG_COLOR = "#f4f6f8"
+BG_COLOR = "#4a4c4d"
 CARD_COLOR = "#ffffff"
 TITLE_COLOR = "#1f3b5b"
 SECTION_COLOR = "#2a5d84"
