@@ -1,6 +1,7 @@
 import serial
 
-ser = serial.Serial("/dev/ttyUSB0", 9600)
+_usb = serial.Serial("/dev/ttyGS0", 115200, timeout=1)
 
 def send_usb(data_line):
-    ser.write((data_line + "\n").encode())
+    _usb.write((data_line + "\n").encode("utf-8"))
+    print(data_line, flush=True)

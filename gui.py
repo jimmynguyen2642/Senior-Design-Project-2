@@ -38,12 +38,12 @@ class SensorGUI:
         self.display_frame = None
         self.labels = {}
 
-        self.serial_port = "COM3"
+        self.serial_port = "COM5"
         self.baud_rate = 9600
         self.ser = None
         
         # Turn this off when only USB.
-        self.use_mock_if_serial_fails = True
+        self.use_mock_if_serial_fails = False
 
         self.make_main_menu()
 
