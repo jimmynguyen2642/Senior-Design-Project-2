@@ -38,7 +38,7 @@ class SensorGUI:
         self.display_frame = None
         self.labels = {}
 
-        self.serial_port = "COM5"
+        self.serial_port = "COM4"
         self.baud_rate = 9600
         self.ser = None
         
@@ -66,12 +66,37 @@ class SensorGUI:
         )
         title.pack(pady=(0, 25))
 
-        start_btn = tk.Button(card, text="Start Display", width=20, font=("Arial", 12), command=self.start_display)
+        port_label = tk.Label(
+            card,
+            text="Enter COM Port (USB or Bluetooth):",
+            font=("Arial", 12),
+            bg=CARD_COLOR,
+            fg=TEXT_COLOR
+        )
+        port_label.pack(pady=(0, 5))
+
+        self.port_entry = tk.Entry(card, width=20, font=("Arial", 12))
+        self.port_entry.insert(0, self.serial_port)
+        self.port_entry.pack(pady=(0, 15))
+
+        start_btn = tk.Button(
+            card,
+            text="Start Display",
+            width=20,
+            font=("Arial", 12),
+            command=self.start_display
+        )
         start_btn.pack(pady=10)
 
-        quit_btn = tk.Button(card, text="Quit", width=20, font=("Arial", 12), command=self.close_app)
+        quit_btn = tk.Button(
+            card,
+            text="Quit",
+            width=20,
+            font=("Arial", 12),
+            command=self.close_app
+        )
         quit_btn.pack(pady=10)
-
+        
     def connect_serial(self):
         try:
             self.ser = serial.Serial(self.serial_port, self.baud_rate, timeout=1)
@@ -114,10 +139,18 @@ class SensorGUI:
             return None
 
     def start_display(self):
+        entered_port = self.port_entry.get().strip()
+
+        if entered_port:
+            self.serial_port = entered_port
+
         serial_connected = self.connect_serial()
 
         if not serial_connected and not self.use_mock_if_serial_fails:
-            messagebox.showerror("Connection Error", "No USB stream available.")
+            messagebox.showerror(
+                "Connection Error",
+                f"No serial stream available on {self.serial_port}."
+            )
             self.make_main_menu()
             return
 
