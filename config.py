@@ -15,7 +15,7 @@ CSV_HEADER = [
     "mag_z"
 ]
 
-LOG_FILE = "sensor_log.csv"
+LOG_FILE = "/mnt/sdcard/sensor_log.csv"
 RADIO_PORT = "/dev/serial0"   # example, may change later
 RADIO_BAUD = 9600
 SAMPLE_PERIOD = 1.0
