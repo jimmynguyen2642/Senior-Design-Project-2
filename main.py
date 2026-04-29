@@ -38,6 +38,8 @@ def build_row():
 
 def main():
     init_log()
+    init_usb()
+    init_radio()
     while True:
         print("--- loop start ---", flush=True)
         row = build_row()
