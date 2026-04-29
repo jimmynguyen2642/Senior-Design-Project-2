@@ -5,8 +5,8 @@ from datetime import datetime
 from gps import read_gps
 from imu import read_imu
 from logger import init_log, write_log_row
-from radio import send_radio
-from usb_stream import send_usb
+from radio import send_radio, init_radio
+from usb_stream import send_usb, init_usb
 
 def build_row():
     print("reading gps...", flush=True)
