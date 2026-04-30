@@ -1,0 +1,6 @@
+adafruit-circuitpython-gps
+adafruit-circuitpython-bno055
+pyserial
+adafruit-blinka
+RPi.GPIO
+spidev
