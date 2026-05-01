@@ -48,7 +48,7 @@ def build_row():
     return row, gps_data["satellites"]
 
 def main():
-    init_log()
+    # init_log()
     init_usb()
     init_radio()
     init_led()
@@ -60,7 +60,7 @@ def main():
             row, satellites = build_row()
             csv_line = ",".join(str(x) for x in row)
 
-            write_log_row(row)
+            # write_log_row(row)
             send_usb(csv_line)
             send_radio(csv_line)
             flash_state = update_led(satellites, flash_state)
