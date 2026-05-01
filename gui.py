@@ -40,7 +40,7 @@ def _rotation_matrix(roll_deg, pitch_deg, yaw_deg):
 
 def _box_faces(R):
     """Return the 6 faces of a rotated unit box centred at origin."""
-    hw, hh, hd = 1.6, 0.4, 0.9          # half-extents  (wide flat device)
+    hw, hh, hd = 1.6, 0.4, 0.9  # half-extents  (wide flat device)
     corners = np.array([
         [-hw,-hh,-hd],[ hw,-hh,-hd],[ hw, hh,-hd],[-hw, hh,-hd],
         [-hw,-hh, hd],[ hw,-hh, hd],[ hw, hh, hd],[-hw, hh, hd],
