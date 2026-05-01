@@ -1,33 +1,39 @@
 import time
 from datetime import datetime
+import threading
 import RPi.GPIO as GPIO
-
 from gps import read_gps
 from imu import read_imu
 from logger import init_log, write_log_row
 from radio import send_radio, init_radio
 from usb_stream import send_usb, init_usb
 
-LED_PIN = 23 #pin 16
+LED_PIN = 22
+_gps_locked = False
+_led_running = False
 
 def init_led():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(LED_PIN, GPIO.OUT)
     GPIO.output(LED_PIN, GPIO.LOW)
 
-def update_led(satellites, flash_state):
-    if satellites >= 3:
-        GPIO.output(LED_PIN, GPIO.HIGH)  # solid on = locked
-        return flash_state
-    else:
-        # flash while searching
-        new_state = not flash_state
-        GPIO.output(LED_PIN, GPIO.HIGH if new_state else GPIO.LOW)
-        return new_state
+def led_thread():
+    global _gps_locked, _led_running
+    state = False
+    while _led_running:
+        if _gps_locked:
+            GPIO.output(LED_PIN, GPIO.HIGH)
+            time.sleep(0.1)
+        else:
+            state = not state
+            GPIO.output(LED_PIN, GPIO.HIGH if state else GPIO.LOW)
+            time.sleep(0.25)  # flash 2x per second
 
 def build_row():
+    global _gps_locked
     gps_data = read_gps()
     imu_data = read_imu()
+    _gps_locked = gps_data["satellites"] >= 3
     timestamp = datetime.now().isoformat()
     row = [
         timestamp,
@@ -48,25 +54,24 @@ def build_row():
     return row, gps_data["satellites"]
 
 def main():
-    # init_log()
+    global _led_running
     init_usb()
     init_radio()
     init_led()
 
-    flash_state = False
+    _led_running = True
+    t = threading.Thread(target=led_thread, daemon=True)
+    t.start()
 
     try:
         while True:
             row, satellites = build_row()
             csv_line = ",".join(str(x) for x in row)
-
-            # write_log_row(row)
             send_usb(csv_line)
             send_radio(csv_line)
-            flash_state = update_led(satellites, flash_state)
-
             time.sleep(1.0)
     except KeyboardInterrupt:
+        _led_running = False
         GPIO.cleanup()
 
 if __name__ == "__main__":
