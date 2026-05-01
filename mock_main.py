@@ -23,7 +23,7 @@ CSV_HEADER = [
     "mag_x",     "mag_y",     "mag_z"
 ]
 
-#  Mock data state 
+# Mock data state 
 _t = 0.0  # time counter for smooth animation
 
 def mock_row():
@@ -60,7 +60,7 @@ def row_to_list(d):
         d["mag_x"], d["mag_y"], d["mag_z"]
     ]
 
-#  SD card / CSV logging 
+# SD card / CSV logging 
 def init_log():
     os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
     if not os.path.exists(LOG_FILE):
@@ -75,7 +75,7 @@ def write_log(row):
     except Exception as e:
         print(f"SD write error: {e}", flush=True)
 
-#  Serial helpers 
+# Serial helpers 
 def init_serial(port, baud, name):
     try:
         s = serial.Serial(port, baud, timeout=1)
