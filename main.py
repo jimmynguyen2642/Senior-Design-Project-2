@@ -8,7 +8,7 @@ from logger import init_log, write_log_row
 from radio import send_radio, init_radio
 from usb_stream import send_usb, init_usb
 
-LED_PIN = 17
+LED_PIN = 23 #pin 16
 
 def init_led():
     GPIO.setmode(GPIO.BCM)
