@@ -1,6 +1,6 @@
-# main.py - temporary debug version
 import time
 from datetime import datetime
+import RPi.GPIO as GPIO
 
 from gps import read_gps
 from imu import read_imu
@@ -8,15 +8,26 @@ from logger import init_log, write_log_row
 from radio import send_radio, init_radio
 from usb_stream import send_usb, init_usb
 
+LED_PIN = 17
+
+def init_led():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(LED_PIN, GPIO.OUT)
+    GPIO.output(LED_PIN, GPIO.LOW)
+
+def update_led(satellites, flash_state):
+    if satellites >= 3:
+        GPIO.output(LED_PIN, GPIO.HIGH)  # solid on = locked
+        return flash_state
+    else:
+        # flash while searching
+        new_state = not flash_state
+        GPIO.output(LED_PIN, GPIO.HIGH if new_state else GPIO.LOW)
+        return new_state
+
 def build_row():
-    print("reading gps...", flush=True)
     gps_data = read_gps()
-    print("gps done", flush=True)
-
-    print("reading imu...", flush=True)
     imu_data = read_imu()
-    print("imu done", flush=True)
-
     timestamp = datetime.now().isoformat()
     row = [
         timestamp,
@@ -34,26 +45,29 @@ def build_row():
         imu_data["mag_y"],
         imu_data["mag_z"]
     ]
-    return row
+    return row, gps_data["satellites"]
 
 def main():
     init_log()
     init_usb()
     init_radio()
-    while True:
-        print("--- loop start ---", flush=True)
-        row = build_row()
-        csv_line = ",".join(str(x) for x in row)
+    init_led()
 
-        print("writing log...", flush=True)
-        write_log_row(row)
-        print("sending usb...", flush=True)
-        send_usb(csv_line)
-        print("sending radio...", flush=True)
-        send_radio(csv_line)
-        print("sleeping...", flush=True)
+    flash_state = False
 
-        time.sleep(1.0)
+    try:
+        while True:
+            row, satellites = build_row()
+            csv_line = ",".join(str(x) for x in row)
+
+            write_log_row(row)
+            send_usb(csv_line)
+            send_radio(csv_line)
+            flash_state = update_led(satellites, flash_state)
+
+            time.sleep(1.0)
+    except KeyboardInterrupt:
+        GPIO.cleanup()
 
 if __name__ == "__main__":
     main()
